@@ -109,7 +109,7 @@ Create it from the repo file:
 
 ```powershell
 aws mediaconvert create-job-template `
-  --endpoint-url https://abcd1234.mediaconvert.us-east-1.amazonaws.com `
+  --endpoint-url https://mediaconvert.us-east-1.amazonaws.com `
   --region us-east-1 `
   --cli-input-json file://infrastructure/mediaconvert/job-template-hls-ladder.json
 ```
@@ -119,7 +119,7 @@ If the template already exists, update it instead:
 ```powershell
 aws mediaconvert update-job-template `
   --name mc-demo-hls-ladder `
-  --endpoint-url https://abcd1234.mediaconvert.us-east-1.amazonaws.com `
+  --endpoint-url https://mediaconvert.us-east-1.amazonaws.com `
   --region us-east-1 `
   --cli-input-json file://infrastructure/mediaconvert/job-template-hls-ladder.json
 ```
@@ -127,7 +127,7 @@ aws mediaconvert update-job-template `
 Validate template presence:
 
 ```powershell
-aws mediaconvert list-job-templates --endpoint-url https://abcd1234.mediaconvert.us-east-1.amazonaws.com --region us-east-1
+aws mediaconvert list-job-templates --endpoint-url https://mediaconvert.us-east-1.amazonaws.com --region us-east-1
 ```
 
 Confirm:

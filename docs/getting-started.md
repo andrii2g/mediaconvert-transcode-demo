@@ -101,6 +101,7 @@ Re-check before running:
 - MediaConvert endpoint is real
 - MediaConvert role ARN is real
 - MediaConvert template exists
+- MediaConvert template output groups are `hls-360p`, `hls-480p`, and `hls-720p`
 
 ## 3. AWS Setup Order
 

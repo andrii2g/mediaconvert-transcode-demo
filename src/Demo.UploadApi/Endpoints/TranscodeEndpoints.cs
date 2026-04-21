@@ -187,6 +187,7 @@ public static class TranscodeEndpoints
         string videoId,
         IManifestStore manifestStore,
         ITranscodeOrchestrator orchestrator,
+        IOptions<MediaConvertOptions> mediaConvertOptions,
         CancellationToken cancellationToken)
     {
         var manifest = await manifestStore.GetAsync(videoId, cancellationToken);
@@ -219,8 +220,12 @@ public static class TranscodeEndpoints
             updatedManifest.LastKnownStatus,
             updatedManifest.OutputBucket,
             updatedManifest.OutputPrefix,
-            $"{updatedManifest.OutputPrefix}hls/",
-            $"{updatedManifest.OutputPrefix}mp4/"));
+            mediaConvertOptions.Value.Template.OutputGroups
+                .Select(group => new TranscodeOutputGroupResponse(
+                    group.Name,
+                    $"{updatedManifest.OutputPrefix}{group.Prefix.TrimStart('/')}",
+                    group.GroupType))
+                .ToArray()));
     }
 
     private static TranscodeStatusResponse ToStatusResponse(VideoManifest manifest) =>

@@ -18,9 +18,9 @@ public sealed class MediaConvertOrchestrator(
         var request = new CreateJobRequest
         {
             Role = _options.RoleArn,
-            JobTemplate = _options.JobTemplateName,
+            JobTemplate = _options.Template.Name,
             Queue = string.IsNullOrWhiteSpace(_options.QueueArn) ? null : _options.QueueArn,
-            Settings = BuildSettings(manifest),
+            Settings = BuildTemplateOverrides(manifest),
             UserMetadata = new Dictionary<string, string>
             {
                 ["videoId"] = manifest.VideoId,
@@ -71,7 +71,7 @@ public sealed class MediaConvertOrchestrator(
         };
     }
 
-    private static JobSettings BuildSettings(VideoManifest manifest)
+    private JobSettings BuildTemplateOverrides(VideoManifest manifest)
     {
         var baseOutputPath = $"s3://{manifest.OutputBucket}/{manifest.OutputPrefix}";
 
@@ -84,33 +84,41 @@ public sealed class MediaConvertOrchestrator(
                     FileInput = $"s3://{manifest.SourceBucket}/{manifest.SourceKey}"
                 }
             ],
-            OutputGroups =
-            [
-                new OutputGroup
+            OutputGroups = [.. _options.Template.OutputGroups.Select(group => BuildOutputGroup(baseOutputPath, group))]
+        };
+    }
+
+    private static OutputGroup BuildOutputGroup(string baseOutputPath, MediaConvertOutputGroupOptions group)
+    {
+        var destination = $"{baseOutputPath}{group.Prefix.TrimStart('/')}";
+
+        return group.GroupType.ToUpperInvariant() switch
+        {
+            "HLS" => new OutputGroup
+            {
+                Name = group.Name,
+                OutputGroupSettings = new OutputGroupSettings
                 {
-                    Name = "HLS",
-                    OutputGroupSettings = new OutputGroupSettings
+                    Type = OutputGroupType.HLS_GROUP_SETTINGS,
+                    HlsGroupSettings = new HlsGroupSettings
                     {
-                        Type = OutputGroupType.HLS_GROUP_SETTINGS,
-                        HlsGroupSettings = new HlsGroupSettings
-                        {
-                            Destination = $"{baseOutputPath}hls/"
-                        }
-                    }
-                },
-                new OutputGroup
-                {
-                    Name = "MP4",
-                    OutputGroupSettings = new OutputGroupSettings
-                    {
-                        Type = OutputGroupType.FILE_GROUP_SETTINGS,
-                        FileGroupSettings = new FileGroupSettings
-                        {
-                            Destination = $"{baseOutputPath}mp4/"
-                        }
+                        Destination = destination
                     }
                 }
-            ]
+            },
+            "FILE" => new OutputGroup
+            {
+                Name = group.Name,
+                OutputGroupSettings = new OutputGroupSettings
+                {
+                    Type = OutputGroupType.FILE_GROUP_SETTINGS,
+                    FileGroupSettings = new FileGroupSettings
+                    {
+                        Destination = destination
+                    }
+                }
+            },
+            _ => throw new InvalidOperationException($"Unsupported MediaConvert output group type '{group.GroupType}'.")
         };
     }
 }

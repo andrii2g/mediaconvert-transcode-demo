@@ -22,7 +22,14 @@ public static class ServiceCollectionExtensions
             .Bind(configuration.GetSection(MediaConvertOptions.SectionName))
             .Validate(options => !string.IsNullOrWhiteSpace(options.Endpoint), "MediaConvert:Endpoint is required.")
             .Validate(options => !string.IsNullOrWhiteSpace(options.RoleArn), "MediaConvert:RoleArn is required.")
-            .Validate(options => !string.IsNullOrWhiteSpace(options.JobTemplateName), "MediaConvert:JobTemplateName is required.")
+            .Validate(options => !string.IsNullOrWhiteSpace(options.Template.Name), "MediaConvert:Template:Name is required.")
+            .Validate(options => options.Template.OutputGroups.Count > 0, "MediaConvert:Template:OutputGroups must contain at least one item.")
+            .Validate(
+                options => options.Template.OutputGroups.All(group =>
+                    !string.IsNullOrWhiteSpace(group.Name) &&
+                    !string.IsNullOrWhiteSpace(group.Prefix) &&
+                    !string.IsNullOrWhiteSpace(group.GroupType)),
+                "Every MediaConvert:Template:OutputGroups item must define Name, Prefix, and GroupType.")
             .ValidateOnStart();
 
         services.AddSingleton(new JsonSerializerOptions(JsonSerializerDefaults.Web)

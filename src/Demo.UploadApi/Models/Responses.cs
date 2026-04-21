@@ -28,5 +28,9 @@ public sealed record TranscodeResultResponse(
     TranscodeJobStatus Status,
     string OutputBucket,
     string OutputPrefix,
-    string HlsPrefix,
-    string Mp4Prefix);
+    IReadOnlyList<TranscodeOutputGroupResponse> OutputGroups);
+
+public sealed record TranscodeOutputGroupResponse(
+    string Name,
+    string Prefix,
+    string GroupType);

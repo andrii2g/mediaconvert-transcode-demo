@@ -24,4 +24,14 @@ Required values:
 - `Storage:OutputBucket`
 - `MediaConvert:Endpoint`
 - `MediaConvert:RoleArn`
-- `MediaConvert:JobTemplateName`
+- `MediaConvert:Template:Name`
+
+Template-specific values:
+
+- `MediaConvert:Template:OutputGroups`
+- each output group item defines `Name`, `Prefix`, and `GroupType`
+
+Current demo template:
+
+- `mc-demo-hls-ladder`
+- output groups: `hls-360p`, `hls-480p`, `hls-720p`
