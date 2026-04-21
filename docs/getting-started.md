@@ -91,28 +91,8 @@ Required project settings: (appsettings.json)
 - `MediaConvert:Endpoint`
 - `MediaConvert:RoleArn`
 - `MediaConvert:Template:Name`
-- `MediaConvert:Template:HlsOutputGroupName`
-- `MediaConvert:Template:Mp4OutputGroupName`
-- `MediaConvert:Template:HlsDestinationSuffix`
-- `MediaConvert:Template:Mp4DestinationSuffix`
+- `MediaConvert:Template:OutputGroups`
 
-Recommended local debug setup:
-
-```powershell
-$env:Storage__InputBucket="mc-demo-input-123456789012-eu-central-1"
-$env:Storage__OutputBucket="mc-demo-output-123456789012-eu-central-1"
-$env:Storage__UploadPrefix="uploads"
-$env:Storage__OutputPrefix="outputs"
-$env:Storage__ManifestPrefix="system/jobs"
-$env:MediaConvert__Endpoint="https://abcd1234.mediaconvert.eu-central-1.amazonaws.com"
-$env:MediaConvert__RoleArn="arn:aws:iam::123456789012:role/MediaConvertDemoRole"
-$env:MediaConvert__Template__Name="mc-demo-basic-hls-mp4"
-$env:MediaConvert__Template__HlsOutputGroupName="HLS"
-$env:MediaConvert__Template__Mp4OutputGroupName="MP4"
-$env:MediaConvert__Template__HlsDestinationSuffix="hls/"
-$env:MediaConvert__Template__Mp4DestinationSuffix="mp4/"
-$env:AWS_REGION="eu-central-1"
-```
 
 Re-check before running:
 

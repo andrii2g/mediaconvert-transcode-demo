@@ -103,7 +103,7 @@ If jobs fail after submission, this is one of the first places to re-check.
 
 Expected template name for this repo:
 
-- `mc-demo-basic-hls-mp4`
+- `mc-demo-hls-ladder`
 
 Create it from the repo file:
 
@@ -111,17 +111,17 @@ Create it from the repo file:
 aws mediaconvert create-job-template `
   --endpoint-url https://abcd1234.mediaconvert.us-east-1.amazonaws.com `
   --region us-east-1 `
-  --cli-input-json file://infrastructure/mediaconvert/job-template-basic-hls-mp4.json
+  --cli-input-json file://infrastructure/mediaconvert/job-template-hls-ladder.json
 ```
 
 If the template already exists, update it instead:
 
 ```powershell
 aws mediaconvert update-job-template `
-  --name mc-demo-basic-hls-mp4 `
+  --name mc-demo-hls-ladder `
   --endpoint-url https://abcd1234.mediaconvert.us-east-1.amazonaws.com `
   --region us-east-1 `
-  --cli-input-json file://infrastructure/mediaconvert/job-template-basic-hls-mp4.json
+  --cli-input-json file://infrastructure/mediaconvert/job-template-hls-ladder.json
 ```
 
 Validate template presence:
@@ -137,8 +137,8 @@ Confirm:
 
 Also confirm the template is compatible with this project:
 
-- it supports one HLS output group
-- it supports one MP4/file output group
+- it supports three HLS output groups
+- the output group names are `hls-360p`, `hls-480p`, and `hls-720p`
 - it can work with S3 input and S3 output destinations
 
 ## 6. Re-check Ability to Start Jobs
