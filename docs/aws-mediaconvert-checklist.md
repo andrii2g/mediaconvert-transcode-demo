@@ -2,12 +2,13 @@
 
 Use this checklist to prepare MediaConvert for this project.
 
+NOTE: use region you have. (us-east-1 used by default)
 ## 1. Validate Endpoint Discovery
 
 Run:
 
 ```powershell
-aws mediaconvert describe-endpoints --region eu-central-1
+aws mediaconvert describe-endpoints --region us-east-1
 ```
 
 Confirm:
@@ -22,14 +23,41 @@ Record:
 Example:
 
 ```text
-https://abcd1234.mediaconvert.eu-central-1.amazonaws.com
+https://mediaconvert.us-east-1.amazonaws.com
 ```
 
 This exact value must be used for:
 
 - `MediaConvert:Endpoint`
 
-## 2. Re-check Your Local IAM Permissions
+## 2. Create the MediaConvert Service Role
+
+Create a dedicated IAM role for MediaConvert before continuing.
+
+This role is used by MediaConvert jobs themselves to:
+
+- read source objects from the input bucket
+- write transcoded outputs to the output bucket
+
+The role name does not have to be exactly `MediaConvertDemoRole`. That name is only an example.
+
+After creating the role, validate it exists:
+
+```powershell
+aws iam get-role --role-name YourActualMediaConvertRoleName
+```
+
+Record:
+
+- the exact role name
+- the exact role ARN
+
+This exact ARN must be used for:
+
+- `MediaConvert:RoleArn`
+- the IAM simulation command for `iam:PassRole`
+
+## 3. Re-check Your Local IAM Permissions
 
 Your local AWS identity should have permissions equivalent to:
 
@@ -39,36 +67,19 @@ Your local AWS identity should have permissions equivalent to:
 - `mediaconvert:GetJob`
 - `iam:PassRole` on the MediaConvert service role
 
-Validate the basic access:
+Validate with one IAM simulation command:
 
 ```powershell
-aws mediaconvert describe-endpoints --region eu-central-1
-aws mediaconvert list-job-templates --endpoint-url https://abcd1234.mediaconvert.eu-central-1.amazonaws.com --region eu-central-1
+aws iam simulate-principal-policy `
+  --policy-source-arn arn:aws:iam::123456789012:user/your-user-or-role `
+  --action-names mediaconvert:DescribeEndpoints mediaconvert:ListJobTemplates mediaconvert:CreateJob mediaconvert:GetJob iam:PassRole `
+  --resource-arns * arn:aws:iam::123456789012:role/MediaConvertDemoRole
 ```
 
 Confirm:
 
-- both commands succeed
-
-## 3. Create the MediaConvert Service Role
-
-Create a dedicated IAM role for MediaConvert.
-
-This role is used by MediaConvert jobs themselves.
-
-Confirm the role exists:
-
-```powershell
-aws iam get-role --role-name MediaConvertDemoRole
-```
-
-Record:
-
-- the exact role ARN
-
-This exact value must be used for:
-
-- `MediaConvert:RoleArn`
+- `EvalDecision` is `allowed` for the MediaConvert actions you need
+- `iam:PassRole` is allowed for the exact MediaConvert role ARN
 
 ## 4. Re-check MediaConvert Role S3 Permissions
 
@@ -77,7 +88,9 @@ The MediaConvert service role should allow:
 - `s3:GetObject` on input objects
 - `s3:ListBucket` on the input bucket
 - `s3:PutObject` on output objects
-- `s3:GetBucketLocation` where required
+
+NOTE: [Setting up access for other AWS accounts to your AWS Elemental MediaConvert outputs](https://docs.aws.amazon.com/mediaconvert/latest/ug/setting-up-access-for-other-aws-accounts.html)
+(and look at the policy `s3:PutObjectAcl`)
 
 Confirm:
 
@@ -92,10 +105,29 @@ Expected template name for this repo:
 
 - `mc-demo-basic-hls-mp4`
 
+Create it from the repo file:
+
+```powershell
+aws mediaconvert create-job-template `
+  --endpoint-url https://abcd1234.mediaconvert.us-east-1.amazonaws.com `
+  --region us-east-1 `
+  --cli-input-json file://infrastructure/mediaconvert/job-template-basic-hls-mp4.json
+```
+
+If the template already exists, update it instead:
+
+```powershell
+aws mediaconvert update-job-template `
+  --name mc-demo-basic-hls-mp4 `
+  --endpoint-url https://abcd1234.mediaconvert.us-east-1.amazonaws.com `
+  --region us-east-1 `
+  --cli-input-json file://infrastructure/mediaconvert/job-template-basic-hls-mp4.json
+```
+
 Validate template presence:
 
 ```powershell
-aws mediaconvert list-job-templates --endpoint-url https://abcd1234.mediaconvert.eu-central-1.amazonaws.com --region eu-central-1
+aws mediaconvert list-job-templates --endpoint-url https://abcd1234.mediaconvert.us-east-1.amazonaws.com --region us-east-1
 ```
 
 Confirm:
@@ -137,7 +169,7 @@ MediaConvert is ready when:
 
 - endpoint discovery succeeds
 - the endpoint URL is recorded
-- your local caller can list templates
+- IAM simulation allows the MediaConvert actions you need
 - the MediaConvert role exists
 - the MediaConvert role has correct S3 permissions
 - the job template exists
