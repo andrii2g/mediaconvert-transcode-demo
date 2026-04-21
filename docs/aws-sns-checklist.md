@@ -36,7 +36,7 @@ Validate with one IAM simulation command:
 aws iam simulate-principal-policy `
   --policy-source-arn arn:aws:iam::123456789012:user/your-user-or-role `
   --action-names sns:CreateTopic sns:GetTopicAttributes sns:Publish `
-  --resource-arns arn:aws:sns:eu-central-1:123456789012:mc-demo-workflow-events
+  --resource-arns arn:aws:sns:us-east-1:123456789012:mc-demo-workflow-events
 ```
 
 Confirm:

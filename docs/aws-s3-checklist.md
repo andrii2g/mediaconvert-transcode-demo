@@ -11,14 +11,14 @@ Create two buckets:
 
 Example names:
 
-- `mc-demo-input-123456789012-eu-central-1`
-- `mc-demo-output-123456789012-eu-central-1`
+- `mc-demo-input-123456789012-us-east-1`
+- `mc-demo-output-123456789012-us-east-1`
 
 Validate:
 
 ```powershell
-aws s3api head-bucket --bucket mc-demo-input-123456789012-eu-central-1
-aws s3api head-bucket --bucket mc-demo-output-123456789012-eu-central-1
+aws s3api head-bucket --bucket mc-demo-input-123456789012-us-east-1
+aws s3api head-bucket --bucket mc-demo-output-123456789012-us-east-1
 ```
 
 Confirm:
@@ -74,7 +74,7 @@ Validate with one IAM simulation command:
 aws iam simulate-principal-policy `
   --policy-source-arn arn:aws:iam::123456789012:user/your-user-or-role `
   --action-names s3:ListBucket s3:GetObject s3:PutObject `
-  --resource-arns arn:aws:s3:::mc-demo-input-123456789012-eu-central-1 arn:aws:s3:::mc-demo-input-123456789012-eu-central-1/* arn:aws:s3:::mc-demo-output-123456789012-eu-central-1 arn:aws:s3:::mc-demo-output-123456789012-eu-central-1/*
+  --resource-arns arn:aws:s3:::mc-demo-input-123456789012-us-east-1 arn:aws:s3:::mc-demo-input-123456789012-us-east-1/* arn:aws:s3:::mc-demo-output-123456789012-us-east-1 arn:aws:s3:::mc-demo-output-123456789012-us-east-1/*
 ```
 
 Confirm:
