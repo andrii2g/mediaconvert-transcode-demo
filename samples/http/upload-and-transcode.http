@@ -1,0 +1,24 @@
+@host = http://localhost:5096
+
+### Create upload
+POST {{host}}/uploads
+Content-Type: application/json
+
+{
+  "fileName": "sample.mp4",
+  "contentType": "video/mp4"
+}
+
+### Start transcode
+POST {{host}}/transcodes
+Content-Type: application/json
+
+{
+  "videoId": "REPLACE_WITH_VIDEO_ID"
+}
+
+### Poll status
+GET {{host}}/transcodes/REPLACE_WITH_VIDEO_ID
+
+### Fetch result
+GET {{host}}/transcodes/REPLACE_WITH_VIDEO_ID/result
