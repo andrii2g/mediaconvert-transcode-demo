@@ -10,6 +10,48 @@ Use these documents together:
 
 ## 1. Configure AWS Credentials First
 
+Before this step, make sure AWS CLI is installed and available on `PATH`.
+
+### Windows
+
+Install AWS CLI v2 using the official MSI:
+
+- [AWS CLI MSI Installer](https://awscli.amazonaws.com/AWSCLIV2.msi)
+
+Or run:
+
+```bat
+msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi
+```
+
+Then reopen your terminal and verify:
+
+```powershell
+aws --version
+```
+
+### Linux
+
+Install AWS CLI v2 using the official installer:
+
+```bash
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+```
+
+Then verify:
+
+```bash
+aws --version
+```
+
+If `aws` is still not found after installation:
+
+- reopen the terminal
+- confirm the install completed successfully
+- confirm the AWS CLI location is on `PATH`
+
 Run:
 
 ```powershell
@@ -37,56 +79,9 @@ Confirm:
 
 Do not continue until this works.
 
-## 2. Local Debug Credentials for the API
+## 2. Configure Project Settings
 
-The application uses the default AWS SDK credential chain.
-
-Recommended debugging options:
-
-- `aws configure`
-- environment variables
-
-Example:
-
-```powershell
-$env:AWS_ACCESS_KEY_ID="your-access-key-id"
-$env:AWS_SECRET_ACCESS_KEY="your-secret-access-key"
-$env:AWS_REGION="eu-central-1"
-```
-
-Optional:
-
-```powershell
-$env:AWS_SESSION_TOKEN="your-session-token"
-```
-
-Validate again:
-
-```powershell
-aws sts get-caller-identity
-```
-
-### About `appsettings.json`
-
-You can store project settings in:
-
-- [appsettings.json](src/Demo.UploadApi/appsettings.json)
-- [appsettings.Development.json](src/Demo.UploadApi/appsettings.Development.json)
-- environment variables
-
-But for AWS secrets specifically:
-
-- the current code does not read custom AWS access keys from `appsettings.json`
-- use `aws configure` or environment variables for AWS credentials
-
-Good local debugging split:
-
-- AWS credentials from `aws configure` or environment variables
-- project configuration from `appsettings.Development.json` or environment variables
-
-## 3. Configure Project Settings
-
-Required project settings:
+Required project settings: (appsettings.json)
 
 - `Storage:InputBucket`
 - `Storage:OutputBucket`
@@ -95,7 +90,11 @@ Required project settings:
 - `Storage:ManifestPrefix`
 - `MediaConvert:Endpoint`
 - `MediaConvert:RoleArn`
-- `MediaConvert:JobTemplateName`
+- `MediaConvert:Template:Name`
+- `MediaConvert:Template:HlsOutputGroupName`
+- `MediaConvert:Template:Mp4OutputGroupName`
+- `MediaConvert:Template:HlsDestinationSuffix`
+- `MediaConvert:Template:Mp4DestinationSuffix`
 
 Recommended local debug setup:
 
@@ -107,7 +106,11 @@ $env:Storage__OutputPrefix="outputs"
 $env:Storage__ManifestPrefix="system/jobs"
 $env:MediaConvert__Endpoint="https://abcd1234.mediaconvert.eu-central-1.amazonaws.com"
 $env:MediaConvert__RoleArn="arn:aws:iam::123456789012:role/MediaConvertDemoRole"
-$env:MediaConvert__JobTemplateName="mc-demo-basic-hls-mp4"
+$env:MediaConvert__Template__Name="mc-demo-basic-hls-mp4"
+$env:MediaConvert__Template__HlsOutputGroupName="HLS"
+$env:MediaConvert__Template__Mp4OutputGroupName="MP4"
+$env:MediaConvert__Template__HlsDestinationSuffix="hls/"
+$env:MediaConvert__Template__Mp4DestinationSuffix="mp4/"
 $env:AWS_REGION="eu-central-1"
 ```
 
@@ -119,7 +122,7 @@ Re-check before running:
 - MediaConvert role ARN is real
 - MediaConvert template exists
 
-## 4. AWS Setup Order
+## 3. AWS Setup Order
 
 Use this order:
 
@@ -133,7 +136,7 @@ Use this order:
 8. run the API
 9. execute the end-to-end flow
 
-## 5. Build and Run
+## 4. Build and Run
 
 From the repository root:
 
@@ -149,7 +152,7 @@ Confirm:
 - tests pass
 - the API starts
 
-## 6. End-to-End Validation
+## 5. End-to-End Validation
 
 Run this short validation:
 
@@ -164,7 +167,7 @@ Run this short validation:
 9. call `GET /transcodes/{videoId}/result`
 10. confirm outputs exist under `outputs/{videoId}/`
 
-## 7. Final Ready Checklist
+## 6. Final Ready Checklist
 
 You are ready when all of these are true:
 
