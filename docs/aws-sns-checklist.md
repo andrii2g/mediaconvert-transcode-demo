@@ -30,16 +30,19 @@ Your local AWS identity should be able to:
 - get topic attributes
 - publish test messages
 
-Validate:
+Validate with one IAM simulation command:
 
 ```powershell
-aws sns get-topic-attributes --topic-arn <your-topic-arn>
-aws sns publish --topic-arn <your-topic-arn> --message "sns health check"
+aws iam simulate-principal-policy `
+  --policy-source-arn arn:aws:iam::123456789012:user/your-user-or-role `
+  --action-names sns:CreateTopic sns:GetTopicAttributes sns:Publish `
+  --resource-arns arn:aws:sns:eu-central-1:123456789012:mc-demo-workflow-events
 ```
 
 Confirm:
 
-- both commands succeed
+- `EvalDecision` is `allowed` for the SNS actions you need
+- the topic ARN matches the real topic
 
 ## 3. Re-check Topic Policy
 
@@ -97,7 +100,6 @@ Suggested name:
 SNS is ready when:
 
 - the topic exists
-- your local caller can read topic attributes
-- your local caller can publish a test message
+- IAM simulation allows the SNS actions you need
 - the topic policy is reviewed
 - optional test subscriptions work if you created them
