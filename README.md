@@ -1,6 +1,6 @@
 # MediaConvert Transcode Demo
 
-Minimal .NET 10 demo for a two-step upload and transcode flow using only:
+Minimal demo for a two-step upload and transcode flow using only:
 
 - ASP.NET Core API
 - Amazon S3

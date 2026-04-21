@@ -2,6 +2,9 @@ using Demo.UploadApi.Endpoints;
 using Demo.UploadApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration
+    .AddUserSecrets<Program>(optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
