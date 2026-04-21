@@ -29,7 +29,7 @@ Confirm:
 
 Recommended settings:
 
-- block public access
+- block public access (if needed)
 - enable default encryption
 - keep versioning optional
 - optionally add lifecycle cleanup for demo data
@@ -37,7 +37,7 @@ Recommended settings:
 Re-check:
 
 - the buckets are in the intended region
-- public access is blocked
+- public access is blocked (if needed)
 - encryption is enabled
 
 ## 3. Confirm Prefix Layout
@@ -60,57 +60,32 @@ Default values:
 - `outputs`
 - `system/jobs`
 
-## 4. Validate Your Own S3 Access
-
-Your local AWS identity should be able to:
-
-- check bucket existence
-- upload objects
-- download objects
-- read object metadata
-- write manifests to the output bucket
-
-Validate write:
-
-```powershell
-Set-Content -Path .\tmp-s3-check.txt -Value "ok"
-aws s3 cp .\tmp-s3-check.txt s3://mc-demo-output-123456789012-eu-central-1/system/healthcheck/tmp-s3-check.txt
-```
-
-Validate read:
-
-```powershell
-aws s3 cp s3://mc-demo-output-123456789012-eu-central-1/system/healthcheck/tmp-s3-check.txt .\tmp-s3-check-downloaded.txt
-```
-
-Confirm:
-
-- upload succeeds
-- download succeeds
-
-Clean up if desired:
-
-```powershell
-aws s3 rm s3://mc-demo-output-123456789012-eu-central-1/system/healthcheck/tmp-s3-check.txt
-Remove-Item .\tmp-s3-check.txt,.\tmp-s3-check-downloaded.txt
-```
-
-## 5. Re-check IAM Permissions for Your Local Caller
+## 4. Re-check IAM Permissions for Your Local Caller
 
 Your local AWS identity should have permissions equivalent to:
 
 - `s3:ListBucket`
 - `s3:GetObject`
 - `s3:PutObject`
-- `s3:GetBucketLocation`
+
+Validate with one IAM simulation command:
+
+```powershell
+aws iam simulate-principal-policy `
+  --policy-source-arn arn:aws:iam::123456789012:user/your-user-or-role `
+  --action-names s3:ListBucket s3:GetObject s3:PutObject `
+  --resource-arns arn:aws:s3:::mc-demo-input-123456789012-eu-central-1 arn:aws:s3:::mc-demo-input-123456789012-eu-central-1/* arn:aws:s3:::mc-demo-output-123456789012-eu-central-1 arn:aws:s3:::mc-demo-output-123456789012-eu-central-1/*
+```
 
 Confirm:
 
-- you can read the input bucket
-- you can write to the output bucket
-- you can later upload source files through the presigned flow
+- `EvalDecision` is `allowed` for all required actions
+- `s3:ListBucket` is allowed on bucket ARNs
+- `s3:GetObject` and `s3:PutObject` are allowed on object ARNs
 
-## 6. Re-check Bucket Policies
+Use the exact IAM user or role ARN that the application will run as.
+
+## 5. Re-check Bucket Policies
 
 Confirm bucket policies do not block:
 
@@ -121,7 +96,7 @@ Confirm bucket policies do not block:
 
 This is especially important if the account uses restrictive bucket policies.
 
-## 7. Final S3 Ready Checklist
+## 6. Final S3 Ready Checklist
 
 S3 is ready when:
 
@@ -130,5 +105,5 @@ S3 is ready when:
 - public access settings are correct
 - encryption is enabled
 - prefixes are confirmed
-- your local AWS identity can read and write test objects
+- IAM simulation allows `s3:ListBucket`, `s3:GetObject`, and `s3:PutObject`
 - bucket policies do not block the expected callers
